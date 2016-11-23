@@ -9,3 +9,7 @@ Useful to make sure completion handlers of a asynchronous APIs are called exactl
 
 See sample usage in unit tests:
 https://github.com/yixiang/ExactlyOnceBlock/blob/master/ExactlyOnceBlockTests/ExactlyOnceBlockTests.mm
+
+# Know issues
+
+Not thread-safe yet.

@@ -7,18 +7,18 @@ namespace onceblock {
  *   * a C++ class with a public prameterless constructor.
  */
 template <typename AssertFunc, typename ReturnType, typename... Args>
-class RunOnceBlock {
+class ExactlyOnceBlock {
  public:
   using BlockType = ReturnType (^)(Args...);
   using AssertType = AssertFunc;
-  explicit RunOnceBlock(BlockType block)
+  explicit ExactlyOnceBlock(BlockType block)
       : block_(block), is_block_nullable_(block == nil) {}
-  RunOnceBlock(RunOnceBlock &&other)
+  ExactlyOnceBlock(ExactlyOnceBlock &&other)
       : block_(other.Release()), is_block_nullable_(other.is_block_nullable_) {}
-  RunOnceBlock &operator=(RunOnceBlock &&other) {
+  ExactlyOnceBlock &operator=(ExactlyOnceBlock &&other) {
     block_ = other.Release();
   }
-  ~RunOnceBlock() {
+  ~ExactlyOnceBlock() {
     if (block_) {
       AssertFunc()();
     }
@@ -52,15 +52,15 @@ struct NoAssert {
 template <typename AssertFunc>
 struct Maker {
   template <typename ReturnType, typename... Args>
-  static RunOnceBlock<AssertFunc, ReturnType, Args...> Make(
+  static ExactlyOnceBlock<AssertFunc, ReturnType, Args...> Make(
       ReturnType (^block)(Args...)) {
-    return RunOnceBlock<AssertFunc, ReturnType, Args...>(block);
+    return ExactlyOnceBlock<AssertFunc, ReturnType, Args...>(block);
   }
 };
 
 template <typename ReturnType, typename... Args>
-RunOnceBlock<NoAssert, ReturnType, Args...> Make(ReturnType (^block)(Args...)) {
+ExactlyOnceBlock<NoAssert, ReturnType, Args...> Make(
+    ReturnType (^block)(Args...)) {
   return Maker<NoAssert>::Make(block);
 }
-
 }
